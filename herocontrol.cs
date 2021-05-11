@@ -5,34 +5,48 @@ using UnityEngine;
 public class herocontrol : MonoBehaviour
 {
     public Rigidbody2D Rb;
-    //public float speed = 50f;
-    public float h;
     private float fInput = 0.0f;
     public float MaxSpeed = 5f;
-    private float Moveforce;
-    private bool bFaceRight=true;
+    public float Moveforce;
+    public float jumpForce = 400f;
+    public bool jump = false;
+    public AudioClip[] jumpClips;
+
+    public bool bFaceRight=true;
+
     private bool bGrounded = false;
+    private Transform groundCheck;
 
 
     // Start is called before the first frame update
-    void Start()
+    void Start()//初始化工作
     {
         Rb = GetComponent<Rigidbody2D>();
-
+        groundCheck = transform.Find("groundCheck");
     }
 
     // Update is called once per frame
     void Update()
     {
-        h = Input.GetAxis("Horizontal");
+        float h = Input.GetAxis("Horizontal");
         Rb.AddForce(Vector2.right * MaxSpeed * h);
+        bGrounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
+        if (bGrounded)
+        {
+            if (Input.GetButtonDown("Jump") && bGrounded)
+            {
+                GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
+            }
+        }
     }
-    private void FixedUpdate()
+    void FixedUpdate()
     {
         float fInput = Input.GetAxis("Horizontal");
         Rigidbody2D rigidBody = GetComponent<Rigidbody2D>();
-        //控制移动
-        if (fInput * rigidBody.velocity.x < MaxSpeed)
+        
+
+            //控制移动
+            if (fInput * rigidBody.velocity.x < MaxSpeed)
         {
             rigidBody.AddForce(Vector2.right * fInput * Moveforce);
         }
@@ -41,7 +55,8 @@ public class herocontrol : MonoBehaviour
         {
             rigidBody.velocity = new Vector2(Mathf.Sign(rigidBody.velocity.x) * MaxSpeed, rigidBody.velocity.y);
         }
-        if (fInput > 0 && !bFaceRight)
+
+        if (fInput > 0 && !bFaceRight)//左右移动转身
         {
             flip();
         }
@@ -49,10 +64,12 @@ public class herocontrol : MonoBehaviour
         {
             flip();
         }
-    }
-    
-   
-    void flip()
+        
+        
+     }
+        
+
+    void flip()//转身
     {
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
