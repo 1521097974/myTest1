@@ -47,7 +47,7 @@ public class CamerFollow : MonoBehaviour
     }
     private void TrackPlaer()
     {
-        float newX = transform.position.x;
+        float newX = transform.position.x;//摄像机跟随，为了能够记录前一帧的位置，如果初始化为0会卡帧
         float newY = transform.position.y;
 
         if (NeedMoveX())
