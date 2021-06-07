@@ -11,11 +11,12 @@ public class herocontrol : MonoBehaviour
     public float jumpForce = 400f;
     public bool jump = false;
     public AudioClip[] jumpClips;
-
+    [HideInInspector]//共有变量但是不在引擎里显示
     public bool bFaceRight=true;
 
     private bool bGrounded = false;
     private Transform groundCheck;
+    private Animator anim;
 
 
     // Start is called before the first frame update
@@ -23,10 +24,11 @@ public class herocontrol : MonoBehaviour
     {
         Rb = GetComponent<Rigidbody2D>();
         groundCheck = transform.Find("groundCheck");
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
-    void Update()
+    void Update()//每帧都会运算一次
     {
         float h = Input.GetAxis("Horizontal");
         Rb.AddForce(Vector2.right * MaxSpeed * h);
@@ -35,11 +37,18 @@ public class herocontrol : MonoBehaviour
         {
             if (Input.GetButtonDown("Jump") && bGrounded)
             {
+                anim.SetTrigger("jump");
                 GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
+                //anim.SetTrigger()
             }
         }
+        //if(Rb.velocity.x>0.1)//速度设置当大于0.1进行行走动画
+        {
+            float b = Mathf.Abs(Rb.velocity.x);
+            anim.SetFloat("speed", b);//anim是个动画控制器
+        }
     }
-    void FixedUpdate()
+    void FixedUpdate()//在每个短时间里运算一次
     {
         float fInput = Input.GetAxis("Horizontal");
         Rigidbody2D rigidBody = GetComponent<Rigidbody2D>();
